@@ -26,7 +26,7 @@ class Tree:
                 column_entropy -= contribution
         return column_entropy
 
-    def calculate_features_entropy(self, data, filters_to_delete = None):
+    def calculate_features_entropy(self, data,filter_to_delete):
         column_entropy = 0
         result = {}
         types = []
@@ -34,10 +34,10 @@ class Tree:
                                 "PhysActivity", "Fruits",
                                 "Veggies", "HvyAlcoholConsump", "AnyHealthcare", "NoDocbcCost", "GenHlth", "DiffWalk",
                                 "Sex", "Education", "Income"]
-        if filters_to_delete is not  None:
-            for filter_to_delete in filters_to_delete:
-                if filter_to_delete in features_column_name:
-                    self.remove_value(features_column_name, filter_to_delete)
+        if filter_to_delete is not None:
+            if filter_to_delete in features_column_name:
+                features_column_name = self.remove_value(features_column_name,filter_to_delete)
+        print(features_column_name)
         for column_name in features_column_name:
             for value in data[column_name]:
                 if value not in types:
@@ -67,9 +67,10 @@ class Tree:
             if v > max_gain:
                 max_gain = v
                 max_feature = k
+        print(f"{max_feature} | {max_gain}")
         return max_feature
 
-    def create_child(self, data, labels, feature_name, filters_to_delete = None):
+    def create_child(self, data, labels, feature_name):
         length = len(data[feature_name])
         result = {}
         filters_to_delete = []
@@ -84,14 +85,9 @@ class Tree:
         for key, value in result.items():
             result[key] = self.calculate_parent_entropy_sub_leaf(value)
         print(result)
-        print(self.calculate_features_entropy(data, feature_name))
-        print(self.find_max_gain(labels, result))
-        if filters_to_delete is not None:
-            filters_to_delete.append(self.find_max_gain(labels, self.calculate_features_entropy(data)))
-        else:
-            filters_to_delete.append(self.find_max_gain(labels, self.calculate_features_entropy(data)))
-        print(filters_to_delete)
-        # self.create_child(data, labels, self.find_max_gain(labels, self.calculate_features_entropy(data, feature_name)),filters_to_delete)
+
+        print(self.calculate_features_entropy(data,feature_name))
+        # print(self.find_max_gain(labels, result))
 
     def calculate_parent_entropy_sub_leaf(self, data):
         column_entropy = 0
@@ -119,6 +115,7 @@ class Tree:
             if list1[i] == item:
                 del list1[i]
                 break
+        return list1
 
     def create_tree(self, root_feature, data, labels):
         id_counter = 0
