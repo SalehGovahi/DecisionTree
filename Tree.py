@@ -1,123 +1,43 @@
-import math
-
 from Node import *
-
-
-# class TreeNode:
-#     def __init__(self, base):
-#         self.base = base
-#         self.label = ""
-#
-#     # def add_leaf (self, leaf_label,data):
+from Calculating import *
 
 
 class Tree:
+    root = Node
+    def __init__(self, data, feature_name, labels):
+        self.root = Node(data, None, False, feature_name, labels)
+        unique_values = data[feature_name].unique()
+        data_frame_each_unique = {value: data[data[feature_name] == value] for value in unique_values}
 
-    def calculate_parent_entropy(self, data):
-        column_entropy = 0
-        types = []
-        for value in data['Diabetes_012']:
-            if value not in types:
-                types.append(value)
-                probability = data['Diabetes_012'].value_counts()[value] / len(data['Diabetes_012'])
+        for value, data_frame in data_frame_each_unique.items():
+            print(f"DataFrame for GenHlth = {value}:")
+            print(data_frame)
 
-                contribution = probability * math.log2(probability)
+        data = {
+            'Diabetes_012': []
+        }
+        index_list = []
+        for value, data_frame in data_frame_each_unique.items():
+            index_list.append(data_frame.index.tolist())
+        label_indexes = []
+        print(index_list)
+        for x in index_list:
+            value = labels.loc[x, 'Diabetes_012']
+            value = value.item()
+            label_indexes.append(value)
+            print("label indexes")
+            print(label_indexes)
+        print(label_indexes)
+        # print(label_indexes)
+        # data['Diabetes_012'] = index_list
+        #
+        # label_data_frame = pd.DataFrame(data)
+        # print(label_data_frame)
+        # result = {}
+        # for value, data_frame in data_frame_each_unique.items():
+        #     result[value] = calculate_gain_column(data_frame, label_data_frame)
+        # print(result)
 
-                column_entropy -= contribution
-        return column_entropy
 
-    def calculate_features_entropy(self, data,filter_to_delete):
-        column_entropy = 0
-        result = {}
-        types = []
-        features_column_name = ["HighBP", "HighChol", "CholCheck", "Smoker", "Stroke", "HeartDiseaseorAttack",
-                                "PhysActivity", "Fruits",
-                                "Veggies", "HvyAlcoholConsump", "AnyHealthcare", "NoDocbcCost", "GenHlth", "DiffWalk",
-                                "Sex", "Education", "Income"]
-        if filter_to_delete is not None:
-            if filter_to_delete in features_column_name:
-                features_column_name = self.remove_value(features_column_name,filter_to_delete)
-        print(features_column_name)
-        for column_name in features_column_name:
-            for value in data[column_name]:
-                if value not in types:
-                    types.append(value)
-                    probability = data[column_name].value_counts()[value] / len(data[column_name])
-                    # print(probability)
-                    # print(math.log2(probability))
-                    contribution = probability * math.log2(probability)
-                    # print(f"{column_name} , {value} , {contribution}")
-                    column_entropy -= contribution
-            result[column_name] = column_entropy
-            column_entropy = 0
-        return result
+    # def add_children(self,data, parent,feature_name, labels):
 
-    def calculate_gain(self, labels, column_data):
-        result = {}
-        parent_entropy = self.calculate_parent_entropy(labels)
-        for k, v in column_data.items():
-            result[k] = parent_entropy - v
-        return result
-
-    def find_max_gain(self, labels, column_data):
-        base_file = self.calculate_gain(labels, column_data)
-        max_gain = 0
-        max_feature = ""
-        for k, v in column_data.items():
-            if v > max_gain:
-                max_gain = v
-                max_feature = k
-        print(f"{max_feature} | {max_gain}")
-        return max_feature
-
-    def create_child(self, data, labels, feature_name):
-        length = len(data[feature_name])
-        result = {}
-        filters_to_delete = []
-        filters_to_delete = filters_to_delete
-        for i in range(len(data[feature_name])):
-            if data[feature_name][i] in result.keys():
-                result[data[feature_name][i]].append(i)
-            else:
-                result[data[feature_name][i]] = []
-                result[data[feature_name][i]].append(i)
-        print(result)
-        for key, value in result.items():
-            result[key] = self.calculate_parent_entropy_sub_leaf(value)
-        print(result)
-
-        print(self.calculate_features_entropy(data,feature_name))
-        # print(self.find_max_gain(labels, result))
-
-    def calculate_parent_entropy_sub_leaf(self, data):
-        column_entropy = 0
-        types = []
-        for value in data:
-            if value not in types:
-                repetition = self.count_repetition(data, value)
-                types.append(value)
-                probability = repetition / len(data)
-
-                contribution = probability * math.log2(probability)
-
-                column_entropy -= contribution
-        return column_entropy
-
-    def count_repetition(self, list1, item):
-        count = 0
-        for i in list1:
-            if i == item:
-                count += 1
-        return count
-
-    def remove_value(self, list1, item):
-        for i in range(len(list1)):
-            if list1[i] == item:
-                del list1[i]
-                break
-        return list1
-
-    def create_tree(self, root_feature, data, labels):
-        id_counter = 0
-        children = []
-        root = Node(id_counter, False, root_feature, children, None, data, labels)
