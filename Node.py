@@ -13,7 +13,7 @@ class Node:
 
     def is_magority(self):
         lst = self.data["Diabetes_012"].tolist()
-        print(f"lst is {lst}")
+        # print(f"lst is {lst}")
         temp = {}
         type = []
         for x in lst:
@@ -22,7 +22,7 @@ class Node:
             else:
                 temp[x] = 1
         max_key = max(temp, key=temp.get)
-        print(f"magority is {max_key/len(lst)}")
+        # print(f"magority is {max_key/len(lst)}")
         if (max_key/len(lst)) >= self.MAGORITY:
             self.is_leaf = True
             return True

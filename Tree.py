@@ -35,6 +35,15 @@ class Tree:
                 self.this_node = Node(data_frame, self.parent_default, False, max_gain_feature_name, None)
                 self.parent_default.add_child(self.this_node)
 
+            for child in self.root.children:
+                if child.is_magority() is False:
+                    for value, data_frame in data_frame_each_unique.items():
+                        max_gain_feature_name = max_gain_feature_column(merged_csv[columns_to_filter],
+                                                                        merged_csv["Diabetes_012"])
+                        self.parent_default = child
+                        self.this_node = Node(data_frame, self.parent_default, False, max_gain_feature_name, None)
+                        self.parent_default.add_child(self.this_node)
+
     def draw_tree(self):
         try:
             G = nx.DiGraph()
