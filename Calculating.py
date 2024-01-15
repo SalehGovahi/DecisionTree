@@ -20,16 +20,11 @@ def gain(y, x):
     return original_entropy - subsets_entropy
 
 
-def read_files_and_calculate_gain(features_file_path, labels_file_path):
-    # Read features and labels into dataframes
-    df_features = pd.read_csv(features_file_path)
-    df_labels = pd.read_csv(labels_file_path)
+def calculate_gain(df_features, df_labels):
 
-    # Ensure that the labels are a single column dataframe
-    assert df_labels.shape[1] == 1, "Labels file should only have one column"
 
     # Convert labels dataframe to a 1D list
-    y = df_labels.iloc[:, 0].tolist()
+    y = df_labels.tolist()
 
     # Calculate gain for each feature
     gain_dict = {}
@@ -40,24 +35,12 @@ def read_files_and_calculate_gain(features_file_path, labels_file_path):
     return gain_dict
 
 
-def max_gain_feature(features_file_path, labels_file_path):
-    gain_dict = read_files_and_calculate_gain(features_file_path, labels_file_path)
+def max_gain_feature(features, labels):
+    gain_dict = calculate_gain(features, labels)
     max_gain = 0
     max_feature = None
     for k, v in gain_dict.items():
         if v > max_gain:
             max_gain = v
             max_feature = k
-    return max_feature
-
-
-def calculate_gain_column(feature, label):
-    y = label.values
-    gain_dict = {column: gain(y, feature[column].values) for column in feature.columns}
-    return gain_dict
-
-
-def max_gain_feature_column(features, labels):
-    gain_dict = calculate_gain_column(features, labels)
-    max_feature = max(gain_dict, key=gain_dict.get)
     return max_feature

@@ -1,57 +1,59 @@
+import numpy as np
+
 from Node import *
 from Calculating import *
-import networkx as nx
-import matplotlib.pyplot as plt
 
 
-def add_children(parent, child):
-    parent.add_child(child)
 class Tree:
-    root = None
-    parent_default = None
-    this_node = None
 
     def __init__(self):
         self.root = None
 
-    def add_node(self, merged_csv, feature_name):
-        columns_to_filter = ["HighBP", "HighChol", "CholCheck", "Smoker", "Stroke", "HeartDiseaseorAttack",
-                             "PhysActivity", "Fruits",
-                             "Veggies", "HvyAlcoholConsump", "AnyHealthcare", "NoDocbcCost", "GenHlth", "DiffWalk",
-                             "Sex", "Education", "Income"]
-        if self.root is None:
-            self.this_node = Node(merged_csv, self.parent_default, False, feature_name, None)
-            self.root = self.this_node
-            unique_values = merged_csv[feature_name].unique()
-            data_frame_each_unique = {value: merged_csv[merged_csv[feature_name] == value] for value in unique_values}
+    def add_node(self, data, feature_name, parent, child):
+        node = Node(data, feature_name, parent, child)  # Pass child here
+        if parent is not None:
+            parent.add_child(node)
+        return node
 
-            if feature_name in columns_to_filter:
-                columns_to_filter.remove(feature_name)
+    def build_tree(self, node ,data):
+        if len(data["Diabetes_012"].unique()) == 1:
+            return
 
-            for value, data_frame in data_frame_each_unique.items():
-                max_gain_feature_name = max_gain_feature_column(merged_csv[columns_to_filter],
-                                                                merged_csv["Diabetes_012"])
-                self.parent_default = self.root
-                self.this_node = Node(data_frame, self.parent_default, False, max_gain_feature_name, None)
-                self.parent_default.add_child(self.this_node)
+        unique_values = data[node.feature_name].unique()
+        data_frame_each_unique = {value: data[data[node.feature_name] == value] for value in unique_values}
+        data = data.drop(node.feature_name, axis=1)
 
-            for child in self.root.children:
-                if child.is_magority() is False:
-                    for value, data_frame in data_frame_each_unique.items():
-                        max_gain_feature_name = max_gain_feature_column(merged_csv[columns_to_filter],
-                                                                        merged_csv["Diabetes_012"])
-                        self.parent_default = child
-                        self.this_node = Node(data_frame, self.parent_default, False, max_gain_feature_name, None)
-                        self.parent_default.add_child(self.this_node)
+        result = {}
+        for k, v in data_frame_each_unique.items():
+            gain1 = max_gain_feature(data.drop("Diabetes_012", axis=1), data["Diabetes_012"])
+            if gain1 is None:
+                continue
+            data_frame = {"data_frame": v}
+            gain = {"gain": gain1}
+            result[k] = [gain, data_frame]
 
-    def draw_tree(self):
-        try:
-            G = nx.DiGraph()
-            edges = self.root.get_edges()
-            G.add_edges_from(edges)
+        for k, v in result.items():
+            child_node = self.add_node(v[1]["data_frame"], v[0]["gain"], node, k)
+            self.build_tree(child_node, v[1]["data_frame"])
 
-            pos = nx.spring_layout(G)
-            nx.draw(G, pos, with_labels=True, font_weight='bold')
-            plt.savefig("tree.png")
-        except Exception as e:
-            print(f"An error occurred: {e}")
+    def build(self, data, feature_name):
+        self.root = self.add_node(data, feature_name, None, None)
+        self.build_tree(self.root, data)
+
+    def print_tree(self, node, depth=0):
+        print(' ' * depth + str(node.feature_name))
+        for child in node.children:
+            self.print_tree(child, depth + 1)
+
+    def predict(self, data, node):
+        if len(node.children) == 0:
+            return node.feature_name
+
+        for child in node.children:
+            # Add validation here
+            if child.child in data.columns and child.feature_name == data[child.child]:
+                return self.predict(data, child)
+
+        return np.nan
+
+
