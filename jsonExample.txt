@@ -1,0 +1,19 @@
+{
+    "HighBP": 0 ,
+    "HighChol": 0,
+    "CholCheck": 1,
+    "Smoker": 0,
+    "Stroke": 0,
+    "HeartDiseaseorAttack": 0,
+    "PhysActivity": 1,
+    "Fruits": 0,
+    "Veggies": 0,
+    "HvyAlcoholConsump": 0,
+    "AnyHealthcare": 1,
+    "NoDocbcCost": 0,
+    "GenHlth": 1,
+    "DiffWalk": 0,
+    "Sex": 1,
+    "Education": 5,
+    "Income": 8
+}
