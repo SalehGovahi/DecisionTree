@@ -21,12 +21,7 @@ def gain(y, x):
 
 
 def calculate_gain(df_features, df_labels):
-
-
-    # Convert labels dataframe to a 1D list
     y = df_labels.tolist()
-
-    # Calculate gain for each feature
     gain_dict = {}
     for column in df_features.columns:
         x = df_features[column].tolist()
