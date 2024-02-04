@@ -1,0 +1,62 @@
+.App {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+  background: url('doctor.jpg') center/cover no-repeat; /* Add your image path */
+  backdrop-filter: blur(10px); /* Adjust the blur effect */
+}
+
+.App.show {
+  opacity: 1;
+}
+
+
+
+
+.doctor-board {
+  border: 2px solid #61dafb;
+  padding: 50px;
+  max-width: 600px;
+  transform-origin: center;
+  transition: transform 0.8s ease-in-out, box-shadow 0.5s ease-in-out;
+  background-color: rgba(34, 167, 234, 0.2); /* Adjust alpha for transparency */
+  border-radius: 10px; /* Add border radius for a softer look */
+  box-shadow: 0 0 10px rgba(34, 167, 234, 0.8); /* Add box-shadow for a subtle glass effect */
+  cursor: pointer; /* Change cursor on hover */
+}
+
+.doctor-board:hover {
+  background-color: rgba(34, 167, 234, 0.8); /* Adjust alpha for transparency */
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.4); /* Adjust box-shadow on hover */
+  transform: scale(1.1); /* Scale the board on hover */
+}
+
+.doctor-board.rotate {
+  transform: rotate(360deg);
+}
+
+h1 {
+  color: #000000;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+.patient-info p {
+  margin: 8px 0;
+}
+
+.medical-report {
+  margin-top: 20px;
+}
+
+.report-details p {
+  margin: 8px 0;
+}
+
+
+
